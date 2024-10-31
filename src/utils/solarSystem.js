@@ -19,7 +19,7 @@ export const initUniverse = (scene) => {
 
   // 环境光
   let ambientLight = new THREE.AmbientLight();
-  scene.add(ambientLight);
+  // scene.add(ambientLight);
 
   // 创建中心太阳点光源
   let pointLight = new THREE.PointLight(0xffffff, 1.2, 0);
@@ -79,10 +79,11 @@ export const initRevolutionTrajectory = (data, scene) => {
 };
 
 // 获取普通星球本体mesh
-export const getPlanetMesh = (data) => {
+export const getPlanetMesh = (data, material, materialParam={}) => {
   const planetGeometry = new THREE.SphereGeometry(data.size, 100, 100);
-  const planetMaterial = new THREE.MeshLambertMaterial({
+  const planetMaterial = new THREE[material]({
     map: new THREE.TextureLoader().load(data.mapImg),
+    ...materialParam,
   });
   return new THREE.Mesh(planetGeometry, planetMaterial);
 };
@@ -101,7 +102,7 @@ const getSunAtmosphereMesh = (data) => {
 // 太阳
 export const initSun = (data, scene) => {
   let sunGroup = new THREE.Group(); //太阳的组
-  sunGroup.add(getPlanetMesh(data));
+  sunGroup.add(getPlanetMesh(data, 'MeshBasicMaterial', { transparent: true, opacity: 1.0 }));
   
   // sunGroup.add(getSunAtmosphereMesh(data));
   sunGroup.name = data.name; //网格名字
@@ -117,16 +118,6 @@ export const initSun = (data, scene) => {
   scene.add(sunGroup);
 };
 
-// 地球mesh
-const getEarth = (data) => {
-  const earthGeometry = new THREE.SphereGeometry(data.size, 100, 100);
-  const earthMaterial = new THREE.MeshPhysicalMaterial({
-    map: new THREE.TextureLoader().load(data.mapImg),
-    normalScale: new THREE.Vector2(10, 10),
-    normalMap: new THREE.TextureLoader().load(earthNormalImg),
-  });
-  return new THREE.Mesh(earthGeometry, earthMaterial);
-};
 // 地球云层mesh
 const getEarthClouds = (data) => {
   const earthCloudsGeometry = new THREE.SphereGeometry(data.size + 2, 100, 100);
@@ -164,7 +155,10 @@ const getMoon = (data) => {
 // 地球
 export const initEarth = (data, scene) => {
   const earthGroup = new THREE.Group();
-  earthGroup.add(getEarth(data));
+  earthGroup.add(getPlanetMesh(data, 'MeshPhysicalMaterial', {
+    normalScale: new THREE.Vector2(10, 10),
+    normalMap: new THREE.TextureLoader().load(earthNormalImg),
+  }));
   earthGroup.add(getEarthClouds(data));
   earthGroup.add(getMoonTrack(data));
   earthGroup.add(getMoon(data));
@@ -197,7 +191,7 @@ const getVenusAtmosphere = (data) => {
 // 金星
 export const initVenus = (data, scene) => {
   const venusGroup = new THREE.Group();
-  venusGroup.add(getPlanetMesh(data));
+  venusGroup.add(getPlanetMesh(data, 'MeshLambertMaterial'));
   
   venusGroup.add(getVenusAtmosphere(data)); //将大气添加到组中
   venusGroup.name = data.name; //网格名字
@@ -231,7 +225,7 @@ const getSaturnTrack = (data, ringParams, opacity) => {
 // 土星
 export const initSaturn = (data, scene) => {
   const saturnGroup = new THREE.Group();
-  saturnGroup.add(getPlanetMesh(data));
+  saturnGroup.add(getPlanetMesh(data, 'MeshLambertMaterial'));
   saturnGroup.add(getSaturnTrack(data, [10, 25], 0.8)); //将网格添加到组中
   saturnGroup.add(getSaturnTrack(data, [26, 30], 0.5));
   saturnGroup.add(getSaturnTrack(data, [30.1, 32], 0.3));

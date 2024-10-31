@@ -73,7 +73,7 @@ const createSphere = (data) => {
       initSaturn(data, scene);
       break;
     default:
-      const sphereMesh = getPlanetMesh(data);
+      const sphereMesh = getPlanetMesh(data, 'MeshLambertMaterial');
       sphereMesh.name = data.name; //网格名字
       sphereMesh.planetMsg = data;
       sphereMesh.isPlanet = true; //标识为星球
