@@ -6,7 +6,10 @@ import moonImg from "../assets/img/moon.jpg"; //月球
 import earthNormalImg from "../assets/img/earthNormal.jpg"; //法线贴图
 import earthCloudsImg from "../assets/img/earthClouds.jpg"; //地球云层
 
-// 初始化宇宙
+/**
+ * 初始化宇宙背景
+ * @param {THREE.Scene} scene - Three.js场景对象
+ */
 export const initUniverse = (scene) => {
   let universeGeometry = new THREE.SphereGeometry(7000, 100, 100);
   let texture = new THREE.TextureLoader().load(universeImg);
@@ -29,17 +32,13 @@ export const initUniverse = (scene) => {
 
 // 背景星辰mesh
 export const initBackgroundStars = (scene) => {
-  const positions = [];
+  const positions = new Float32Array(8000 * 3);
   //星辰几何体
   const starsGeometry = new THREE.BufferGeometry();
   //添加星辰的颜色与位置
-  for (let i = 0; i < 8000; i++) {
-    let vertex = new THREE.Vector3();
-    vertex.x = Math.random() * 2 - 1;
-    vertex.y = Math.random() * 2 - 1;
-    vertex.z = Math.random() * 2 - 1;
-    positions.push(vertex.x, vertex.y, vertex.z);
-  }
+  Array.from(positions).forEach((position, i) => {
+    positions[i] = Math.random() * 2 - 1;
+  });
   starsGeometry.setAttribute(
     "position",
     new THREE.Float32BufferAttribute(positions, 3)
@@ -49,7 +48,6 @@ export const initBackgroundStars = (scene) => {
     map: new THREE.TextureLoader().load(starImg),
     size: 6,
     blending: THREE.AdditiveBlending,
-    fog: true,
     depthTest: false,
   });
   //星辰的集合
@@ -70,6 +68,7 @@ export const initRevolutionTrajectory = (data, scene) => {
   );
   let trackMaterial = new THREE.LineBasicMaterial({
     color: '#f8f8f8',
+    linewidth: 0.5,
     side: THREE.DoubleSide,
   });
   let trackMesh = new THREE.Mesh(trackGeometry, trackMaterial);
@@ -105,16 +104,14 @@ export const initSun = (data, scene) => {
   sunGroup.add(getPlanetMesh(data, 'MeshBasicMaterial', { transparent: true, opacity: 1.0 }));
   
   // sunGroup.add(getSunAtmosphereMesh(data));
-  sunGroup.name = data.name; //网格名字
-  sunGroup.planetMsg = data;
-  sunGroup.isPlanet = true; //标识为星球
-  sunGroup.angle = 0; //添加初始角度
+  Object.assign(sunGroup, {
+    name: data.name,
+    planetMsg: data,
+    isPlanet: true,
+    angle: 0,
+  });
   //球体位置
-  sunGroup.position.set(
-    data.position[0],
-    data.position[1],
-    data.position[2]
-  );
+  sunGroup.position.set(data.position);
   scene.add(sunGroup);
 };
 
@@ -163,16 +160,14 @@ export const initEarth = (data, scene) => {
   earthGroup.add(getMoonTrack(data));
   earthGroup.add(getMoon(data));
 
-  earthGroup.name = data.name; //网格名字
-  earthGroup.planetMsg = data;
-  earthGroup.isPlanet = true; //标识为星球
-  earthGroup.angle = 0; //添加初始角度
+  Object.assign(earthGroup, {
+    name: data.name,
+    planetMsg: data,
+    isPlanet: true,
+    angle: 0,
+  });
   //球体位置
-  earthGroup.position.set(
-    data.position[0],
-    data.position[1],
-    data.position[2]
-  );
+  earthGroup.position.set(data.position);
   scene.add(earthGroup);
 };
 
@@ -194,16 +189,14 @@ export const initVenus = (data, scene) => {
   venusGroup.add(getPlanetMesh(data, 'MeshLambertMaterial'));
   
   venusGroup.add(getVenusAtmosphere(data)); //将大气添加到组中
-  venusGroup.name = data.name; //网格名字
-  venusGroup.planetMsg = data;
-  venusGroup.isPlanet = true; //标识为星球
-  venusGroup.angle = 0; //添加初始角度
+  Object.assign(venusGroup, {
+    name: data.name,
+    planetMsg: data,
+    isPlanet: true,
+    angle: 0,
+  });
   //球体位置
-  venusGroup.position.set(
-    data.position[0],
-    data.position[1],
-    data.position[2]
-  );
+  venusGroup.position.set(data.position);
   scene.add(venusGroup);
 };
 
@@ -229,15 +222,13 @@ export const initSaturn = (data, scene) => {
   saturnGroup.add(getSaturnTrack(data, [10, 25], 0.8)); //将网格添加到组中
   saturnGroup.add(getSaturnTrack(data, [26, 30], 0.5));
   saturnGroup.add(getSaturnTrack(data, [30.1, 32], 0.3));
-  saturnGroup.name = data.name; //网格名字
-  saturnGroup.planetMsg = data;
-  saturnGroup.isPlanet = true; //标识为星球
-  saturnGroup.angle = 0; //添加初始角度
+  Object.assign(saturnGroup, {
+    name: data.name,
+    planetMsg: data,
+    isPlanet: true,
+    angle: 0,
+  });
   //球体位置
-  saturnGroup.position.set(
-    data.position[0],
-    data.position[1],
-    data.position[2]
-  );
+  saturnGroup.position.set(data.position);
   scene.add(saturnGroup);
 };

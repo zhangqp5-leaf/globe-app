@@ -14,6 +14,7 @@ import {
   initVenus,
   initSaturn,
 } from './utils';
+import OperatePanel from '@/components/operatePanel/index.vue';
 
 const solarSystem = ref(null);
 
@@ -33,16 +34,6 @@ let mouse = reactive({});
 
 raycaster = new THREE.Raycaster();
 mouse = new THREE.Vector2();
-
-// 改变位置
-const changeSet = (data) => {
-  if (data.key == "isRevolution") {
-    isRevolution.value = data.val;
-  }
-  if (data.key == "isRotation") {
-    isRotation.value = data.val;
-  }
-};
 
 // 销毁场景
 const destroyScene = () => {
@@ -74,17 +65,15 @@ const createSphere = (data) => {
       break;
     default:
       const sphereMesh = getPlanetMesh(data, 'MeshLambertMaterial');
-      sphereMesh.name = data.name; //网格名字
-      sphereMesh.planetMsg = data;
-      sphereMesh.isPlanet = true; //标识为星球
-      sphereMesh.angle = 0; //添加初始角度
+      Object.assign(sphereMesh, {
+        name: data.name,
+        planetMsg: data,
+        isPlanet: true,
+        angle: 0,
+      });
       //球体位置
-      sphereMesh.position.set(
-        data.position[0],
-        data.position[1],
-        data.position[2]
-      );
-      scene.add(sphereMesh); //球体添加到场景中
+      sphereMesh.position.set(data.position);
+      scene.add(sphereMesh);
       break;
   }
 };
@@ -105,13 +94,13 @@ const sphereRotation = (data) => {
         e.rotation.z =
           e.rotation.z + planetData.rotation >= 2 * Math.PI
             ? 0
-            : e.rotation.z + planetData.rotation;
+            : e.rotation.z + planetData.rotation * 0.1;
         return;
       }
       e.rotation.y =
         e.rotation.y + planetData.rotation >= 2 * Math.PI
           ? 0
-          : e.rotation.y + planetData.rotation;
+          : e.rotation.y + planetData.rotation * 0.1;
     }
   });
 };
@@ -125,7 +114,7 @@ const sphereRevolution = (data) => {
       e.angle =
         e.angle + planetData.revolution >= 2 * Math.PI
           ? 0
-          : e.angle + planetData.revolution;
+          : e.angle + planetData.revolution * 0.1;
       e.position.set(
         planetData.position[0] * Math.sin(e.angle),
         0,
@@ -220,7 +209,10 @@ onMounted(() => {
     <!--描述组件-->
     <!-- <PlanetText v-if="clickPlanet.planetMsg" :msg="clickPlanet.planetMsg" /> -->
     <!--设置组件-->
-    <!-- <SetSolarSystem @changeSet="changeSet" /> -->
+    <OperatePanel
+      @changeRevolutionStatus="status => isRevolution = !!status"
+      @changeRotationStatus="status => isRotation = !!status"
+    />
   </div>
 </template>
 
